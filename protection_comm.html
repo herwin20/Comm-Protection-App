@@ -1,0 +1,3097 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aplikasi Komisioning Proteksi Relay - Lengkap</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        color: #333;
+      }
+      .header {
+        background: linear-gradient(135deg, #1a73e8, #0d47a1);
+        color: white;
+        padding: 20px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .nav-tabs {
+        flex-wrap: wrap;
+      }
+      .nav-tabs .nav-link {
+        color: #495057;
+        font-weight: 500;
+        border: none;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+      .nav-tabs .nav-link.active {
+        color: #1a73e8;
+        background-color: transparent;
+        border-bottom: 3px solid #1a73e8;
+      }
+      .nav-tabs .nav-link:hover {
+        color: #1a73e8;
+        border-bottom: 3px solid #1a73e8;
+        opacity: 0.7;
+      }
+      .card {
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+        border: none;
+      }
+      .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: 600;
+      }
+      .formula-box {
+        background-color: #f0f7ff;
+        border-left: 4px solid #1a73e8;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 0 4px 4px 0;
+      }
+      .theory-box {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      .test-result {
+        background-color: #e8f5e9;
+        padding: 10px;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+      .parameter-input {
+        margin-bottom: 15px;
+      }
+      .parameter-input label {
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+      .calculate-btn {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .calculate-btn:hover {
+        background-color: #0d47a1;
+      }
+      .protection-table {
+        font-size: 0.9rem;
+      }
+      .protection-table th {
+        background-color: #f1f3f4;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .status-pass {
+        color: #2e7d32;
+        font-weight: 500;
+      }
+      .status-fail {
+        color: #c62828;
+        font-weight: 500;
+      }
+      .chart-container {
+        height: 300px;
+        margin: 20px 0;
+      }
+      .test-record-table {
+        font-size: 0.85rem;
+      }
+      .test-record-table td {
+        vertical-align: middle;
+      }
+      .phase-input {
+        width: 80px;
+      }
+      .tolerance-indicator {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .tolerance-good {
+        background-color: #4caf50;
+      }
+      .tolerance-warning {
+        background-color: #ff9800;
+      }
+      .tolerance-bad {
+        background-color: #f44336;
+      }
+      .export-btn {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+      .export-btn:hover {
+        background-color: #388e3c;
+      }
+      .print-btn {
+        background-color: #607d8b;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .print-btn:hover {
+        background-color: #455a64;
+      }
+      .test-summary {
+        background-color: #e3f2fd;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      .injection-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .injection-phase {
+        padding: 10px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        text-align: center;
+      }
+      .injection-phase.active {
+        background-color: #e8f5e9;
+        border: 1px solid #4caf50;
+      }
+      .calculation-proof {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+      }
+      .calculation-step {
+        margin-bottom: 8px;
+        padding-left: 20px;
+        position: relative;
+      }
+      .calculation-step:before {
+        content: "•";
+        position: absolute;
+        left: 5px;
+        color: #1a73e8;
+      }
+      .formula-highlight {
+        background-color: #e3f2fd;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-weight: bold;
+      }
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="container">
+        <h1><i class="fas fa-bolt"></i> Aplikasi Komisioning Proteksi Relay</h1>
+        <p class="mb-0">
+          Sistem Pengujian dan Analisis Proteksi Listrik - Lengkap
+        </p>
+      </div>
+    </div>
+
+    <div class="container mt-4">
+      <ul class="nav nav-tabs" id="protectionTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="dashboard-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#dashboard"
+            type="button"
+            role="tab"
+          >
+            Dashboard
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="test-records-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#test-records"
+            type="button"
+            role="tab"
+          >
+            Data Pengujian
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="negative-sequence-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#negative-sequence"
+            type="button"
+            role="tab"
+          >
+            Neg. Seq (46)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="stator-earth-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#stator-earth"
+            type="button"
+            role="tab"
+          >
+            Stator EF (64G)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="overcurrent-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#overcurrent"
+            type="button"
+            role="tab"
+          >
+            Overcurrent (51)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="distance-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#distance"
+            type="button"
+            role="tab"
+          >
+            Distance (21)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="voltage-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#voltage"
+            type="button"
+            role="tab"
+          >
+            Voltage (27/59)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="frequency-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#frequency"
+            type="button"
+            role="tab"
+          >
+            Frequency (81)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="differential-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#differential"
+            type="button"
+            role="tab"
+          >
+            Differential (87G)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="loss-of-field-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#loss-of-field"
+            type="button"
+            role="tab"
+          >
+            Loss of Field (40)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="reverse-power-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#reverse-power"
+            type="button"
+            role="tab"
+          >
+            Reverse Power (32)
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content mt-3" id="protectionTabsContent">
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5>
+                <i class="fas fa-tachometer-alt"></i> Ringkasan Pengujian
+                Proteksi
+              </h5>
+              <div class="no-print">
+                <button class="export-btn" onclick="exportReport()">
+                  <i class="fas fa-file-excel"></i> Export Excel
+                </button>
+                <button class="print-btn" onclick="window.print()">
+                  <i class="fas fa-print"></i> Print
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="test-summary">
+                <div class="row">
+                  <div class="col-md-3">
+                    <h6>Project</h6>
+                    <p>PLTGU Muara Tawar GT 21-22</p>
+                  </div>
+                  <div class="col-md-3">
+                    <h6>Equipment</h6>
+                    <p>Generator Protection Relay</p>
+                  </div>
+                  <div class="col-md-3">
+                    <h6>Date</h6>
+                    <p id="current-date"></p>
+                  </div>
+                  <div class="col-md-3">
+                    <h6>Engineer</h6>
+                    <p>Herwin Januardi</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h2 class="text-primary">15</h2>
+                      <p class="card-text">Total Tes</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h2 class="text-success">13</h2>
+                      <p class="card-text">Tes Lulus</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h2 class="text-danger">2</h2>
+                      <p class="card-text">Tes Gagal</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="card text-center">
+                    <div class="card-body">
+                      <h2 class="text-info">87%</h2>
+                      <p class="card-text">Tingkat Keberhasilan</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-striped table-hover protection-table">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Proteksi</th>
+                      <th>Kode ANSI</th>
+                      <th>Pengaturan</th>
+                      <th>Injeksi</th>
+                      <th>Waktu Trip Teori</th>
+                      <th>Waktu Trip Aktual</th>
+                      <th>Toleransi</th>
+                      <th>Status</th>
+                      <th class="no-print">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-table-body">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Test Records Tab -->
+        <div class="tab-pane fade" id="test-records" role="tabpanel">
+          <div class="card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5><i class="fas fa-table"></i> Tabel Data Pengujian Lengkap</h5>
+              <div class="no-print">
+                <button class="btn btn-success btn-sm" onclick="addNewTest()">
+                  <i class="fas fa-plus"></i> Tambah Tes
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div
+                class="table-responsive"
+                style="max-height: 600px; overflow-y: auto"
+              >
+                <table class="table table-bordered test-record-table">
+                  <thead class="table-dark">
+                    <tr>
+                      <th rowspan="2">No</th>
+                      <th rowspan="2">PROTECTION</th>
+                      <th rowspan="2">ANSI Code</th>
+                      <th colspan="3">SETTING</th>
+                      <th colspan="4">TEST</th>
+                      <th rowspan="2">Trip Record</th>
+                      <th rowspan="2">Time Record</th>
+                      <th rowspan="2">Theory</th>
+                      <th rowspan="2">Tolerance</th>
+                      <th rowspan="2">Status</th>
+                      <th class="no-print" rowspan="2">Action</th>
+                    </tr>
+                    <tr>
+                      <th>Curve</th>
+                      <th>% of IN/Volt</th>
+                      <th>T (s)</th>
+                      <th>Injection L1</th>
+                      <th>Injection L2</th>
+                      <th>Injection L3</th>
+                      <th>Voltage</th>
+                    </tr>
+                  </thead>
+                  <tbody id="test-records-body">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Negative Sequence Tab -->
+        <div class="tab-pane fade" id="negative-sequence" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Negative
+                Sequence (ANSI 46)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Negative Sequence (ANSI 46) dirancang untuk
+                  mendeteksi ketidakseimbangan arus dalam sistem three-phase
+                  yang disebabkan oleh beban tidak seimbang, fault
+                  phase-to-phase, atau kondisi operasi abnormal lainnya.
+                </p>
+                <p>
+                  Menurut standar IEEE C37.102, proteksi ini menggunakan
+                  komponen negative sequence dari arus untuk mendeteksi
+                  ketidakseimbangan. Komponen negative sequence muncul ketika
+                  terjadi ketidakseimbangan dalam sistem three-phase.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Komponen Negative Sequence:</strong></p>
+                <p>I₂ = (1/3) × (Ia + a² × Ib + a × Ic)</p>
+                <p>Dimana a = e^(j120°) = -0.5 + j0.866</p>
+                <br />
+                <p><strong>Waktu Trip untuk Karakteristik DT:</strong></p>
+                <p>T = Tset (konstan)</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="ns-pickup">Arus Pickup (% IN)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="ns-pickup"
+                      value="0.08"
+                      step="0.01"
+                      onchange="calculateNegativeSequence()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="ns-time">Waktu Trip (s)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="ns-time"
+                      value="5"
+                      step="0.1"
+                      onchange="calculateNegativeSequence()"
+                    />
+                  </div>
+                  <h6 class="mt-3">Injeksi Per Fasa</h6>
+                  <div class="injection-grid">
+                    <div class="injection-phase">
+                      <label>L1</label
+                      ><input
+                        type="number"
+                        class="form-control phase-input"
+                        id="ns-l1-value"
+                        value="0.75"
+                        step="0.01"
+                        onchange="calculateNegativeSequence()"
+                      /><small>A</small>
+                    </div>
+                    <div class="injection-phase">
+                      <label>L2</label
+                      ><input
+                        type="number"
+                        class="form-control phase-input"
+                        id="ns-l2-value"
+                        value="0"
+                        step="0.01"
+                        onchange="calculateNegativeSequence()"
+                      /><small>A</small>
+                    </div>
+                    <div class="injection-phase">
+                      <label>L3</label
+                      ><input
+                        type="number"
+                        class="form-control phase-input"
+                        id="ns-l3-value"
+                        value="0"
+                        step="0.01"
+                        onchange="calculateNegativeSequence()"
+                      /><small>A</small>
+                    </div>
+                  </div>
+                  <button
+                    class="calculate-btn"
+                    onclick="calculateNegativeSequence()"
+                  >
+                    Hitung Waktu Trip
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('ns')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div id="ns-result" class="test-result" style="display: none">
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Waktu Trip Teori: <span id="ns-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="ns-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('ns')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="ns-deviation">-</span>%</p>
+                    <p>Status: <span id="ns-status">-</span></p>
+                  </div>
+                  <div
+                    id="ns-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="ns-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="ns-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stator Earth Fault Tab -->
+        <div class="tab-pane fade" id="stator-earth" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Stator Earth
+                Fault (ANSI 64G)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Stator Earth Fault (ANSI 64G) dirancang untuk
+                  mendeteksi ground fault pada stator generator. Proteksi ini
+                  sangat penting karena ground fault pada stator dapat
+                  menyebabkan kerusakan serius pada generator jika tidak segera
+                  dideteksi.
+                </p>
+                <p>
+                  Menurut standar IEEE C37.101, proteksi ini menggunakan
+                  pengukuran tegangan zero sequence atau arus residual untuk
+                  mendeteksi ground fault.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Tegangan Zero Sequence:</strong></p>
+                <p>V₀ = (1/3) × (Va + Vb + Vc)</p>
+                <br />
+                <p><strong>Posisi Fault pada Stator:</strong></p>
+                <p>% Fault = (Vmeasured / Vrated) × 100%</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="se-voltage">Tegangan Pickup (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="se-voltage"
+                      value="10"
+                      step="0.1"
+                      onchange="calculateStatorEarth()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="se-time">Waktu Trip (s)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="se-time"
+                      value="0.5"
+                      step="0.1"
+                      onchange="calculateStatorEarth()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="se-injection">Tegangan Injeksi (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="se-injection"
+                      value="9.5"
+                      step="0.1"
+                      onchange="calculateStatorEarth()"
+                    />
+                  </div>
+                  <button
+                    class="calculate-btn"
+                    onclick="calculateStatorEarth()"
+                  >
+                    Hitung Waktu Trip
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('se')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div id="se-result" class="test-result" style="display: none">
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Waktu Trip Teori: <span id="se-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="se-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('se')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="se-deviation">-</span>%</p>
+                    <p>Status: <span id="se-status">-</span></p>
+                  </div>
+                  <div
+                    id="se-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="se-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="se-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overcurrent Tab -->
+        <div class="tab-pane fade" id="overcurrent" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Overcurrent
+                (ANSI 50/51)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Overcurrent (ANSI 50/51) adalah salah satu proteksi
+                  yang paling umum digunakan dalam sistem tenaga listrik.
+                  Proteksi ini beroperasi ketika arus melebihi nilai yang telah
+                  ditentukan sebelumnya.
+                </p>
+                <p>
+                  Menurut standar IEEE C37.112, ada dua jenis utama proteksi
+                  overcurrent: Instantaneous (ANSI 50) dan Time Overcurrent
+                  (ANSI 51) yang memiliki karakteristik waktu terbalik (inverse
+                  time).
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Standard Inverse (SI):</strong></p>
+                <p>T = TMS × 0.14 / ((I/Iset)0.02 - 1)</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="oc-pickup">Arus Pickup (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="oc-pickup"
+                      value="1.2"
+                      step="0.1"
+                      onchange="calculateOvercurrent()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="oc-tms">TMS</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="oc-tms"
+                      value="0.1"
+                      step="0.01"
+                      onchange="calculateOvercurrent()"
+                    />
+                  </div>
+                  <h6 class="mt-3">Injeksi Per Fasa</h6>
+                  <div class="injection-grid">
+                    <div class="injection-phase active">
+                      <label>L1</label
+                      ><input
+                        type="number"
+                        class="form-control phase-input"
+                        id="oc-l1-value"
+                        value="2.4"
+                        step="0.1"
+                        onchange="calculateOvercurrent()"
+                      /><small>A</small>
+                    </div>
+                    <div class="injection-phase active">
+                      <label>L2</label
+                      ><input
+                        type="number"
+                        class="form-control phase-input"
+                        id="oc-l2-value"
+                        value="2.4"
+                        step="0.1"
+                        onchange="calculateOvercurrent()"
+                      /><small>A</small>
+                    </div>
+                    <div class="injection-phase active">
+                      <label>L3</label
+                      ><input
+                        type="number"
+                        class="form-control phase-input"
+                        id="oc-l3-value"
+                        value="2.4"
+                        step="0.1"
+                        onchange="calculateOvercurrent()"
+                      /><small>A</small>
+                    </div>
+                  </div>
+                  <button
+                    class="calculate-btn"
+                    onclick="calculateOvercurrent()"
+                  >
+                    Hitung Waktu Trip
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('oc')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div id="oc-result" class="test-result" style="display: none">
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Waktu Trip Teori: <span id="oc-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="oc-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('oc')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="oc-deviation">-</span>%</p>
+                    <p>Status: <span id="oc-status">-</span></p>
+                  </div>
+                  <div
+                    id="oc-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="oc-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="oc-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Distance Protection Tab -->
+        <div class="tab-pane fade" id="distance" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Jarak (ANSI
+                21)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Jarak (ANSI 21) adalah proteksi utama untuk saluran
+                  transmisi. Proteksi ini mengukur impedansi antara titik
+                  instalasi relay dan lokasi gangguan.
+                </p>
+                <p>
+                  Menurut standar IEEE C37.113, proteksi jarak memiliki beberapa
+                  zona dengan waktu trip yang berbeda.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Impedansi:</strong></p>
+                <p>Z = V / I</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="dp-impedance">Impedansi Reach (Ω)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="dp-impedance"
+                      value="10"
+                      step="0.1"
+                      onchange="calculateDistance()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="dp-voltage">Tegangan Injeksi (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="dp-voltage"
+                      value="100"
+                      step="1"
+                      onchange="calculateDistance()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="dp-current">Arus Injeksi (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="dp-current"
+                      value="10"
+                      step="0.1"
+                      onchange="calculateDistance()"
+                    />
+                  </div>
+                  <button class="calculate-btn" onclick="calculateDistance()">
+                    Hitung Impedansi
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('dp')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div id="dp-result" class="test-result" style="display: none">
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Impedansi Terukur: <span id="dp-measured-z">-</span> Ω
+                    </p>
+                    <p>
+                      Waktu Trip Teori: <span id="dp-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="dp-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('dp')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="dp-deviation">-</span>%</p>
+                    <p>Status: <span id="dp-status">-</span></p>
+                  </div>
+                  <div
+                    id="dp-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="dp-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="dp-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Voltage Tab -->
+        <div class="tab-pane fade" id="voltage" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Under/Over
+                Voltage (ANSI 27/59)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Under/Over Voltage (ANSI 27/59) digunakan untuk
+                  mendeteksi kondisi tegangan yang terlalu rendah atau terlalu
+                  tinggi pada sistem. Under-voltage (27) dapat menyebabkan
+                  masalah pada peralatan, sedangkan over-voltage (59) dapat
+                  menyebabkan isolasi rusak.
+                </p>
+                <p>
+                  Standar IEEE C37.91 memberikan panduan untuk pengaturan
+                  proteksi tegangan ini.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Under Voltage (27):</strong></p>
+                <p>Operate jika V_measured < V_setpoint</p>
+                <br />
+                <p><strong>Over Voltage (59):</strong></p>
+                <p>Operate jika V_measured > V_setpoint</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="volt-type">Tipe Proteksi</label
+                    ><select
+                      class="form-select"
+                      id="volt-type"
+                      onchange="calculateVoltage()"
+                    >
+                      <option value="27">Under Voltage (27)</option>
+                      <option value="59">Over Voltage (59)</option>
+                    </select>
+                  </div>
+                  <div class="parameter-input">
+                    <label for="volt-setpoint">Setpoint Tegangan (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="volt-setpoint"
+                      value="80"
+                      step="1"
+                      onchange="calculateVoltage()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="volt-time">Waktu Trip (s)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="volt-time"
+                      value="2"
+                      step="0.1"
+                      onchange="calculateVoltage()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="volt-injection">Tegangan Injeksi (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="volt-injection"
+                      value="75"
+                      step="1"
+                      onchange="calculateVoltage()"
+                    />
+                  </div>
+                  <button class="calculate-btn" onclick="calculateVoltage()">
+                    Hitung Waktu Trip
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('volt')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div
+                    id="volt-result"
+                    class="test-result"
+                    style="display: none"
+                  >
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Waktu Trip Teori:
+                      <span id="volt-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="volt-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('volt')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="volt-deviation">-</span>%</p>
+                    <p>Status: <span id="volt-status">-</span></p>
+                  </div>
+                  <div
+                    id="volt-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="volt-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="volt-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Frequency Tab -->
+        <div class="tab-pane fade" id="frequency" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Under/Over
+                Frequency (ANSI 81U/81O)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Under/Over Frequency (ANSI 81) sangat penting untuk
+                  stabilitas sistem. Under-frequency (81U) menunjukkan beban
+                  berlebih, sedangkan over-frequency (81O) menunjukkan
+                  kekurangan beban atau generator trip.
+                </p>
+                <p>
+                  Standar IEEE C37.106 mengatur pengaturan dan koordinasi
+                  proteksi frekuensi.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Under Frequency (81U):</strong></p>
+                <p>Operate jika f_measured < f_setpoint</p>
+                <br />
+                <p><strong>Over Frequency (81O):</strong></p>
+                <p>Operate jika f_measured > f_setpoint</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="freq-type">Tipe Proteksi</label
+                    ><select
+                      class="form-select"
+                      id="freq-type"
+                      onchange="calculateFrequency()"
+                    >
+                      <option value="81U">Under Frequency (81U)</option>
+                      <option value="81O">Over Frequency (81O)</option>
+                    </select>
+                  </div>
+                  <div class="parameter-input">
+                    <label for="freq-setpoint">Setpoint Frekuensi (Hz)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="freq-setpoint"
+                      value="48"
+                      step="0.1"
+                      onchange="calculateFrequency()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="freq-time">Waktu Trip (s)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="freq-time"
+                      value="3"
+                      step="0.1"
+                      onchange="calculateFrequency()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="freq-injection">Frekuensi Injeksi (Hz)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="freq-injection"
+                      value="47.5"
+                      step="0.1"
+                      onchange="calculateFrequency()"
+                    />
+                  </div>
+                  <button class="calculate-btn" onclick="calculateFrequency()">
+                    Hitung Waktu Trip
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('freq')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div
+                    id="freq-result"
+                    class="test-result"
+                    style="display: none"
+                  >
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Waktu Trip Teori:
+                      <span id="freq-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="freq-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('freq')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="freq-deviation">-</span>%</p>
+                    <p>Status: <span id="freq-status">-</span></p>
+                  </div>
+                  <div
+                    id="freq-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="freq-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="freq-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Differential Tab -->
+        <div class="tab-pane fade" id="differential" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Differential
+                Generator (ANSI 87G)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Differential Generator (ANSI 87G) adalah proteksi
+                  utama untuk mendeteksi gangguan internal pada generator.
+                  Prinsipnya adalah membandingkan arus masuk dan keluar
+                  generator. Gangguan internal menyebabkan ketidakseimbangan
+                  arus yang signifikan.
+                </p>
+                <p>
+                  Standar IEEE C37.101 memberikan panduan implementasi proteksi
+                  differential.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Arus Operasi (I_op):</strong></p>
+                <p>I_op = |I_terminal - I_neutral|</p>
+                <br />
+                <p><strong>Arus Restrain (I_res):</strong></p>
+                <p>I_res = (|I_terminal| + |I_neutral|) / 2</p>
+                <br />
+                <p><strong>Kondisi Operasi:</strong></p>
+                <p>I_op > (Slope × I_res) + I_bias</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="diff-slope">Slope (%)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="diff-slope"
+                      value="30"
+                      step="1"
+                      onchange="calculateDifferential()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="diff-bias">Arus Bias Minimum (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="diff-bias"
+                      value="0.2"
+                      step="0.01"
+                      onchange="calculateDifferential()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="diff-i-terminal">Arus Terminal (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="diff-i-terminal"
+                      value="5"
+                      step="0.1"
+                      onchange="calculateDifferential()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="diff-i-neutral">Arus Neutral (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="diff-i-neutral"
+                      value="1"
+                      step="0.1"
+                      onchange="calculateDifferential()"
+                    />
+                  </div>
+                  <button
+                    class="calculate-btn"
+                    onclick="calculateDifferential()"
+                  >
+                    Hitung Differential
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('diff')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div
+                    id="diff-result"
+                    class="test-result"
+                    style="display: none"
+                  >
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>Arus Operasi: <span id="diff-i-op">-</span> A</p>
+                    <p>Arus Restrain: <span id="diff-i-res">-</span> A</p>
+                    <p>
+                      Waktu Trip Teori:
+                      <span id="diff-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="diff-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('diff')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="diff-deviation">-</span>%</p>
+                    <p>Status: <span id="diff-status">-</span></p>
+                  </div>
+                  <div
+                    id="diff-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="diff-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="diff-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Loss of Field Tab -->
+        <div class="tab-pane fade" id="loss-of-field" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Loss of Field
+                (ANSI 40)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Loss of Field (ANSI 40) mendeteksi hilangnya eksitasi
+                  pada generator sinkron. Kondisi ini menyebabkan generator
+                  menyerap daya reaktif berlebih dari sistem, yang dapat
+                  menyebabkan stabilitas sistem terganggu.
+                </p>
+                <p>
+                  Standar IEEE C37.102 menjelaskan penggunaan relay impedans
+                  (mho) untuk deteksi loss of field.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Impedansi yang Diukur:</strong></p>
+                <p>Z = V / I</p>
+                <br />
+                <p><strong>Karakteristik Mho Circle:</strong></p>
+                <p>
+                  Operate jika Z terukur berada di dalam karakteristik lingkaran
+                  mho.
+                </p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="lof-z1">Reach Z1 (Ω)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="lof-z1"
+                      value="5"
+                      step="0.1"
+                      onchange="calculateLossOfField()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="lof-z2">Reach Z2 (Ω)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="lof-z2"
+                      value="10"
+                      step="0.1"
+                      onchange="calculateLossOfField()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="lof-voltage">Tegangan Injeksi (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="lof-voltage"
+                      value="100"
+                      step="1"
+                      onchange="calculateLossOfField()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="lof-current">Arus Injeksi (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="lof-current"
+                      value="8"
+                      step="0.1"
+                      onchange="calculateLossOfField()"
+                    />
+                  </div>
+                  <button
+                    class="calculate-btn"
+                    onclick="calculateLossOfField()"
+                  >
+                    Hitung Impedansi
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('lof')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div
+                    id="lof-result"
+                    class="test-result"
+                    style="display: none"
+                  >
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>
+                      Impedansi Terukur: <span id="lof-measured-z">-</span> Ω
+                    </p>
+                    <p>
+                      Waktu Trip Teori:
+                      <span id="lof-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="lof-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('lof')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="lof-deviation">-</span>%</p>
+                    <p>Status: <span id="lof-status">-</span></p>
+                  </div>
+                  <div
+                    id="lof-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="lof-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="lof-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Reverse Power Tab -->
+        <div class="tab-pane fade" id="reverse-power" role="tabpanel">
+          <div class="card">
+            <div class="card-header">
+              <h5>
+                <i class="fas fa-info-circle"></i> Teori Proteksi Reverse Power
+                (ANSI 32)
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="theory-box">
+                <p>
+                  Proteksi Reverse Power (ANSI 32) mencegah generator beroperasi
+                  sebagai motor (motoring), yang dapat menyebabkan kerusakan
+                  pada turbin primer. Ini terjadi jika aliran daya berbalik arah
+                  dari sistem ke generator.
+                </p>
+                <p>
+                  Standar IEEE C37.102 menyediakan panduan untuk pengaturan
+                  proteksi reverse power.
+                </p>
+              </div>
+              <div class="formula-box">
+                <h6>Rumus Perhitungan:</h6>
+                <p><strong>Daya Aktif (P):</strong></p>
+                <p>P = √3 × V × I × cos(φ)</p>
+                <br />
+                <p><strong>Kondisi Operasi:</strong></p>
+                <p>Operate jika P < -P_setpoint (daya negatif)</p>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <h6>Parameter Pengujian</h6>
+                  <div class="parameter-input">
+                    <label for="rpow-setpoint">Setpoint Daya (kW)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="rpow-setpoint"
+                      value="50"
+                      step="1"
+                      onchange="calculateReversePower()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="rpow-time">Waktu Trip (s)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="rpow-time"
+                      value="5"
+                      step="0.1"
+                      onchange="calculateReversePower()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="rpow-voltage">Tegangan Injeksi (V)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="rpow-voltage"
+                      value="100"
+                      step="1"
+                      onchange="calculateReversePower()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="rpow-current">Arus Injeksi (A)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="rpow-current"
+                      value="2"
+                      step="0.1"
+                      onchange="calculateReversePower()"
+                    />
+                  </div>
+                  <div class="parameter-input">
+                    <label for="rpow-pf">Faktor Daya (cos φ)</label
+                    ><input
+                      type="number"
+                      class="form-control"
+                      id="rpow-pf"
+                      value="-0.8"
+                      step="0.01"
+                      onchange="calculateReversePower()"
+                    />
+                  </div>
+                  <button
+                    class="calculate-btn"
+                    onclick="calculateReversePower()"
+                  >
+                    Hitung Daya
+                  </button>
+                  <button
+                    class="btn btn-success ms-2"
+                    onclick="saveTestResult('rpow')"
+                  >
+                    Simpan Hasil
+                  </button>
+                  <div
+                    id="rpow-result"
+                    class="test-result"
+                    style="display: none"
+                  >
+                    <p><strong>Hasil Perhitungan:</strong></p>
+                    <p>Daya Terukur: <span id="rpow-measured-p">-</span> kW</p>
+                    <p>
+                      Waktu Trip Teori:
+                      <span id="rpow-theory-time">-</span> detik
+                    </p>
+                    <p>
+                      Waktu Trip Aktual:
+                      <input
+                        type="number"
+                        class="form-control d-inline-block"
+                        id="rpow-actual-time"
+                        style="width: 100px"
+                        step="0.001"
+                        onchange="calculateDeviation('rpow')"
+                      />
+                      detik
+                    </p>
+                    <p>Deviasi: <span id="rpow-deviation">-</span>%</p>
+                    <p>Status: <span id="rpow-status">-</span></p>
+                  </div>
+                  <div
+                    id="rpow-proof"
+                    class="calculation-proof"
+                    style="display: none"
+                  >
+                    <h6><strong>Pembuktian Perhitungan:</strong></h6>
+                    <div id="rpow-proof-steps">
+                      <!-- Calculation steps will be inserted here -->
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h6>Grafik Karakteristik</h6>
+                  <div class="chart-container">
+                    <canvas id="rpow-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bg-light text-center text-lg-start mt-5">
+      <div
+        class="text-center p-3"
+        style="background-color: rgba(0, 0, 0, 0.05)"
+      >
+        © 2023 Aplikasi Komisioning Proteksi Relay | Berdasarkan Standar IEEE &
+        ANSI
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Global variables
+      let nsChart,
+        seChart,
+        ocChart,
+        dpChart,
+        voltChart,
+        freqChart,
+        diffChart,
+        lofChart,
+        rpowChart;
+      let testRecords = [];
+
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeCharts();
+        updateCurrentDate();
+        loadTestRecords();
+      });
+
+      function updateCurrentDate() {
+        const dateElement = document.getElementById("current-date");
+        if (dateElement) {
+          const today = new Date();
+          dateElement.textContent = today.toLocaleDateString("id-ID", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        }
+      }
+
+      function loadTestRecords() {
+        const savedRecords = localStorage.getItem("testRecords");
+        if (savedRecords) {
+          testRecords = JSON.parse(savedRecords);
+        } else {
+          testRecords = [
+            {
+              id: 1,
+              protection: "Negative Sequence / NPS Current",
+              ansi: "46.1",
+              curve: "DT",
+              setting: "0.08",
+              time: "5",
+              injectionL1: "0.75A",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "-",
+              tripRecord: "Yes",
+              timeRecord: "5.047",
+              theory: "5.000",
+              tolerance: "0.94%",
+              status: "PASS",
+            },
+            {
+              id: 2,
+              protection: "95% stator earth fault",
+              ansi: "64G",
+              curve: "DT",
+              setting: "10V",
+              time: "0.5",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "9.5V",
+              tripRecord: "Yes",
+              timeRecord: "0.512",
+              theory: "0.500",
+              tolerance: "2.40%",
+              status: "PASS",
+            },
+            {
+              id: 3,
+              protection: "Over Current Phase",
+              ansi: "51",
+              curve: "SI",
+              setting: "1.2A",
+              time: "0.1",
+              injectionL1: "2.4A",
+              injectionL2: "2.4A",
+              injectionL3: "2.4A",
+              voltage: "-",
+              tripRecord: "No",
+              timeRecord: "-",
+              theory: "1.400",
+              tolerance: "-",
+              status: "FAIL",
+            },
+            {
+              id: 4,
+              protection: "Distance Protection Z1",
+              ansi: "21",
+              curve: "Quad",
+              setting: "10Ω",
+              time: "0.025",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "V:100V, I:10A",
+              tripRecord: "Yes",
+              timeRecord: "0.028",
+              theory: "0.025",
+              tolerance: "12.00%",
+              status: "PASS",
+            },
+            {
+              id: 5,
+              protection: "Under Voltage",
+              ansi: "27",
+              curve: "DT",
+              setting: "80V",
+              time: "2.0",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "75V",
+              tripRecord: "Yes",
+              timeRecord: "2.045",
+              theory: "2.000",
+              tolerance: "2.25%",
+              status: "PASS",
+            },
+            {
+              id: 6,
+              protection: "Over Frequency",
+              ansi: "81O",
+              curve: "DT",
+              setting: "52Hz",
+              time: "3.0",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "52.5Hz",
+              tripRecord: "Yes",
+              timeRecord: "3.120",
+              theory: "3.000",
+              tolerance: "4.00%",
+              status: "PASS",
+            },
+            {
+              id: 7,
+              protection: "Generator Differential",
+              ansi: "87G",
+              curve: "Dual Slope",
+              setting: "30%",
+              time: "Inst",
+              injectionL1: "I_term:5A",
+              injectionL2: "I_neut:1A",
+              injectionL3: "-",
+              voltage: "-",
+              tripRecord: "Yes",
+              timeRecord: "0.025",
+              theory: "0.025",
+              tolerance: "0.00%",
+              status: "PASS",
+            },
+            {
+              id: 8,
+              protection: "Loss of Field",
+              ansi: "40",
+              curve: "Mho",
+              setting: "Z1:5Ω",
+              time: "T1:0.1s",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "V:100V, I:8A",
+              tripRecord: "Yes",
+              timeRecord: "0.115",
+              theory: "0.100",
+              tolerance: "15.00%",
+              status: "PASS",
+            },
+            {
+              id: 9,
+              protection: "Reverse Power",
+              ansi: "32",
+              curve: "DT",
+              setting: "50kW",
+              time: "5.0",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: "V:100V, I:2A",
+              tripRecord: "Yes",
+              timeRecord: "5.210",
+              theory: "5.000",
+              tolerance: "4.20%",
+              status: "PASS",
+            },
+          ];
+          saveTestRecords();
+        }
+        updateDashboardTable();
+        updateTestRecordsTable();
+      }
+
+      function saveTestRecords() {
+        localStorage.setItem("testRecords", JSON.stringify(testRecords));
+      }
+
+      function initializeCharts() {
+        const commonOptions = { responsive: true, maintainAspectRatio: false };
+        // Existing charts
+        nsChart = new Chart(document.getElementById("ns-chart"), {
+          type: "line",
+          data: {
+            labels: [0.1, 0.2, 0.5, 1, 2, 5, 10],
+            datasets: [
+              {
+                label: "Waktu Trip (s)",
+                data: [5, 5, 5, 5, 5, 5, 5],
+                borderColor: "#1a73e8",
+                backgroundColor: "rgba(26, 115, 232, 0.1)",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "I₂/Iset" } },
+              y: { title: { display: true, text: "Waktu Trip (s)" } },
+            },
+          },
+        });
+        seChart = new Chart(document.getElementById("se-chart"), {
+          type: "line",
+          data: {
+            labels: [10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100],
+            datasets: [
+              {
+                label: "Tegangan Terukur (V)",
+                data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 9.5, 10],
+                borderColor: "#1a73e8",
+                backgroundColor: "rgba(26, 115, 232, 0.1)",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "Lokasi Fault (%)" } },
+              y: { title: { display: true, text: "Tegangan Terukur (V)" } },
+            },
+          },
+        });
+        ocChart = new Chart(document.getElementById("oc-chart"), {
+          type: "line",
+          data: {
+            labels: [1.1, 1.2, 1.5, 2, 3, 5, 10, 20],
+            datasets: [
+              {
+                label: "SI",
+                data: [10, 5, 2.5, 1.5, 0.9, 0.6, 0.4, 0.3],
+                borderColor: "#1a73e8",
+                tension: 0.1,
+              },
+              {
+                label: "VI",
+                data: [15, 8, 4, 2.5, 1.6, 1.1, 0.8, 0.6],
+                borderColor: "#34a853",
+                tension: 0.1,
+              },
+              {
+                label: "EI",
+                data: [25, 15, 8, 5, 3.2, 2.1, 1.5, 1.1],
+                borderColor: "#ea4335",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "I/Iset" } },
+              y: { title: { display: true, text: "Waktu Trip (s)" } },
+            },
+          },
+        });
+        dpChart = new Chart(document.getElementById("dp-chart"), {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Zona 1",
+                data: Array.from({ length: 50 }, () => ({
+                  x: Math.random() * 8,
+                  y: Math.random() * 8,
+                })),
+                backgroundColor: "rgba(26, 115, 232, 0.5)",
+              },
+              {
+                label: "Zona 2",
+                data: Array.from({ length: 50 }, () => ({
+                  x: 8 + Math.random() * 4,
+                  y: 8 + Math.random() * 4,
+                })),
+                backgroundColor: "rgba(52, 168, 83, 0.5)",
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "R (Ω)" } },
+              y: { title: { display: true, text: "X (Ω)" } },
+            },
+          },
+        });
+        // New charts
+        voltChart = new Chart(document.getElementById("volt-chart"), {
+          type: "line",
+          data: {
+            labels: [60, 70, 75, 80, 85, 90, 100, 110],
+            datasets: [
+              {
+                label: "Under Voltage (27)",
+                data: [0, 0, 0, 2, 0, 0, 0, 0],
+                borderColor: "#f44336",
+                tension: 0.1,
+              },
+              {
+                label: "Over Voltage (59)",
+                data: [0, 0, 0, 0, 0, 0, 0, 1],
+                borderColor: "#ff9800",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "Tegangan (V)" } },
+              y: { title: { display: true, text: "Waktu Trip (s)" } },
+            },
+          },
+        });
+        freqChart = new Chart(document.getElementById("freq-chart"), {
+          type: "line",
+          data: {
+            labels: [45, 47, 48, 49, 50, 51, 52, 53, 55],
+            datasets: [
+              {
+                label: "Under Frequency (81U)",
+                data: [0.5, 1, 3, 0, 0, 0, 0, 0, 0],
+                borderColor: "#f44336",
+                tension: 0.1,
+              },
+              {
+                label: "Over Frequency (81O)",
+                data: [0, 0, 0, 0, 0, 0, 2, 0.5, 0.2],
+                borderColor: "#ff9800",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "Frekuensi (Hz)" } },
+              y: { title: { display: true, text: "Waktu Trip (s)" } },
+            },
+          },
+        });
+        diffChart = new Chart(document.getElementById("diff-chart"), {
+          type: "line",
+          data: {
+            labels: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+            datasets: [
+              {
+                label: "Batas Operasi",
+                data: [0.2, 0.5, 0.8, 1.1, 1.4, 1.7, 2.0, 2.3, 2.6],
+                borderColor: "#1a73e8",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "Arus Restrain (A)" } },
+              y: { title: { display: true, text: "Arus Operasi (A)" } },
+            },
+          },
+        });
+        lofChart = new Chart(document.getElementById("lof-chart"), {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Zona 1",
+                data: [
+                  { x: 0, y: 5 },
+                  { x: 5, y: 0 },
+                  { x: 0, y: -5 },
+                  { x: -5, y: 0 },
+                ],
+                showLine: true,
+                fill: false,
+                borderColor: "#1a73e8",
+              },
+              {
+                label: "Zona 2",
+                data: [
+                  { x: 0, y: 10 },
+                  { x: 10, y: 0 },
+                  { x: 0, y: -10 },
+                  { x: -10, y: 0 },
+                ],
+                showLine: true,
+                fill: false,
+                borderColor: "#34a853",
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "R (Ω)" } },
+              y: { title: { display: true, text: "X (Ω)" } },
+            },
+          },
+        });
+        rpowChart = new Chart(document.getElementById("rpow-chart"), {
+          type: "line",
+          data: {
+            labels: [-200, -100, -50, 0, 50, 100, 200],
+            datasets: [
+              {
+                label: "Waktu Trip",
+                data: [5, 5, 5, 0, 0, 0, 0],
+                borderColor: "#1a73e8",
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              x: { title: { display: true, text: "Daya (kW)" } },
+              y: { title: { display: true, text: "Waktu Trip (s)" } },
+            },
+          },
+        });
+      }
+
+      // Enhanced calculation functions with proof
+      function calculateNegativeSequence() {
+        const pickup = parseFloat(document.getElementById("ns-pickup").value);
+        const timeSet = parseFloat(document.getElementById("ns-time").value);
+        const l1Value =
+          parseFloat(document.getElementById("ns-l1-value").value) || 0;
+        const l2Value =
+          parseFloat(document.getElementById("ns-l2-value").value) || 0;
+        const l3Value =
+          parseFloat(document.getElementById("ns-l3-value").value) || 0;
+
+        // Calculate negative sequence current
+        const a = -0.5;
+        const b = 0.866;
+        const i2Real = (l1Value + a * l2Value + a * l3Value) / 3;
+        const i2Imag = (b * l2Value - b * l3Value) / 3;
+        const i2 = Math.sqrt(Math.pow(i2Real, 2) + Math.pow(i2Imag, 2));
+
+        const tripTime = timeSet;
+        const status = i2 >= pickup ? "TRIP" : "NO TRIP";
+
+        // Update result display
+        document.getElementById("ns-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("ns-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("ns-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: Ia = ${l1Value} A, Ib = ${l2Value} A, Ic = ${l3Value} A</div>
+                <div class="calculation-step">Nilai a = -0.5, b = 0.866 (komponen rotasi 120°)</div>
+                <div class="calculation-step">Komponen real I₂ = (Ia + a × Ib + a × Ic) / 3 = (${l1Value} + ${a} × ${l2Value} + ${a} × ${l3Value}) / 3 = ${i2Real.toFixed(3)} A</div>
+                <div class="calculation-step">Komponen imajiner I₂ = (b × Ib - b × Ic) / 3 = (${b} × ${l2Value} - ${b} × ${l3Value}) / 3 = ${i2Imag.toFixed(3)} A</div>
+                <div class="calculation-step">Magnitude I₂ = √(real² + imag²) = √(${i2Real.toFixed(3)}² + ${i2Imag.toFixed(3)}²) = ${i2.toFixed(3)} A</div>
+                <div class="calculation-step">Arus pickup = ${pickup} A</div>
+                <div class="calculation-step">Karena I₂ (${i2.toFixed(3)} A) ${i2 >= pickup ? "≥" : "<"} pickup (${pickup} A), maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk kurva DT = Tset = ${timeSet} detik</div>
+            `;
+        document.getElementById("ns-proof").style.display = "block";
+
+        // Update chart
+        if (nsChart) {
+          const labels = [0.1, 0.2, 0.5, 1, 2, 5, 10];
+          const data = labels.map(() => timeSet);
+          nsChart.data.datasets[0].data = data;
+          nsChart.update();
+        }
+      }
+
+      function calculateStatorEarth() {
+        const voltage = parseFloat(document.getElementById("se-voltage").value);
+        const timeSet = parseFloat(document.getElementById("se-time").value);
+        const injection = parseFloat(
+          document.getElementById("se-injection").value,
+        );
+
+        const tripTime = injection >= voltage * 0.95 ? timeSet : 0;
+        const status = injection >= voltage * 0.95 ? "TRIP" : "NO TRIP";
+        const threshold = voltage * 0.95;
+
+        // Update result display
+        document.getElementById("se-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("se-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("se-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: V_setpoint = ${voltage} V, V_injection = ${injection} V</div>
+                <div class="calculation-step">Threshold operasi = 95% × V_setpoint = 0.95 × ${voltage} = ${threshold.toFixed(2)} V</div>
+                <div class="calculation-step">Karena V_injection (${injection} V) ${injection >= threshold ? "≥" : "<"} threshold (${threshold.toFixed(2)} V), maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk kurva DT = Tset = ${timeSet} detik</div>
+            `;
+        document.getElementById("se-proof").style.display = "block";
+
+        // Update chart
+        if (seChart) {
+          const labels = [10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100];
+          const data = labels.map((loc) => (voltage * loc) / 100);
+          seChart.data.datasets[0].data = data;
+          seChart.update();
+        }
+      }
+
+      function calculateOvercurrent() {
+        const pickup = parseFloat(document.getElementById("oc-pickup").value);
+        const tms = parseFloat(document.getElementById("oc-tms").value);
+        const l1Value =
+          parseFloat(document.getElementById("oc-l1-value").value) || 0;
+        const l2Value =
+          parseFloat(document.getElementById("oc-l2-value").value) || 0;
+        const l3Value =
+          parseFloat(document.getElementById("oc-l3-value").value) || 0;
+
+        // Use maximum of three phases
+        const injection = Math.max(l1Value, l2Value, l3Value);
+        const ratio = injection / pickup;
+        const tripTime = (tms * 0.14) / (Math.pow(ratio, 0.02) - 1);
+        const status = injection >= pickup ? "TRIP" : "NO TRIP";
+
+        // Update result display
+        document.getElementById("oc-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("oc-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("oc-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: I_setpoint = ${pickup} A, TMS = ${tms}</div>
+                <div class="calculation-step">Arus injeksi per fasa: Ia = ${l1Value} A, Ib = ${l2Value} A, Ic = ${l3Value} A</div>
+                <div class="calculation-step">Arus maksimum = max(${l1Value}, ${l2Value}, ${l3Value}) = ${injection} A</div>
+                <div class="calculation-step">Rasio arus = I_injection / I_setpoint = ${injection} / ${pickup} = ${ratio.toFixed(3)}</div>
+                <div class="calculation-step">Karena I_injection (${injection} A) ${injection >= pickup ? "≥" : "<"} I_setpoint (${pickup} A), maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk kurva SI: T = TMS × 0.14 / ((I/Iset)^0.02 - 1)</div>
+                <div class="calculation-step">T = ${tms} × 0.14 / ((${ratio.toFixed(3)})^0.02 - 1) = ${tripTime.toFixed(3)} detik</div>
+            `;
+        document.getElementById("oc-proof").style.display = "block";
+
+        // Update chart
+        if (ocChart) {
+          const labels = [1.1, 1.2, 1.5, 2, 3, 5, 10, 20];
+          const siData = labels.map(
+            (ratio) => (tms * 0.14) / (Math.pow(ratio, 0.02) - 1),
+          );
+          ocChart.data.datasets[0].data = siData;
+          ocChart.update();
+        }
+      }
+
+      function calculateDistance() {
+        const impedance = parseFloat(
+          document.getElementById("dp-impedance").value,
+        );
+        const voltage = parseFloat(document.getElementById("dp-voltage").value);
+        const current = parseFloat(document.getElementById("dp-current").value);
+
+        const measuredZ = voltage / current;
+        const tripTime = 0.025; // Instantaneous for Zone 1
+        const status = measuredZ <= impedance ? "TRIP" : "NO TRIP";
+
+        // Update result display
+        document.getElementById("dp-measured-z").textContent =
+          measuredZ.toFixed(2);
+        document.getElementById("dp-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("dp-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("dp-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: Z_setpoint = ${impedance} Ω, V_injection = ${voltage} V, I_injection = ${current} A</div>
+                <div class="calculation-step">Impedansi terukur = V_injection / I_injection = ${voltage} / ${current} = ${measuredZ.toFixed(2)} Ω</div>
+                <div class="calculation-step">Karena Z_terukur (${measuredZ.toFixed(2)} Ω) ${measuredZ <= impedance ? "≤" : ">"} Z_setpoint (${impedance} Ω), maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk Zona 1 = 0.025 detik (instantaneous)</div>
+            `;
+        document.getElementById("dp-proof").style.display = "block";
+
+        // Update chart
+        if (dpChart) {
+          const zone1Data = Array.from({ length: 50 }, () => {
+            const r = Math.random() * impedance * 0.9;
+            const x = Math.random() * impedance * 0.9;
+            return { x: r, y: x };
+          });
+
+          const zone2Data = Array.from({ length: 50 }, () => {
+            const r = impedance * 0.9 + Math.random() * impedance * 0.3;
+            const x = impedance * 0.9 + Math.random() * impedance * 0.3;
+            return { x: r, y: x };
+          });
+
+          // Add measurement point
+          const measurementPoint = {
+            x: measuredZ * 0.7,
+            y: measuredZ * 0.7,
+          };
+
+          dpChart.data.datasets[0].data = zone1Data;
+          dpChart.data.datasets[1].data = zone2Data;
+
+          // Add measurement point if not already exists
+          if (dpChart.data.datasets.length < 3) {
+            dpChart.data.datasets.push({
+              label: "Pengukuran",
+              data: [measurementPoint],
+              backgroundColor: "rgba(255, 152, 0, 0.8)",
+              pointRadius: 8,
+            });
+          } else {
+            dpChart.data.datasets[2].data = [measurementPoint];
+          }
+
+          dpChart.update();
+        }
+      }
+
+      function calculateVoltage() {
+        const type = document.getElementById("volt-type").value;
+        const setpoint = parseFloat(
+          document.getElementById("volt-setpoint").value,
+        );
+        const timeSet = parseFloat(document.getElementById("volt-time").value);
+        const injection = parseFloat(
+          document.getElementById("volt-injection").value,
+        );
+
+        let tripTime, status;
+        if (type === "27") {
+          // Under Voltage
+          tripTime = injection < setpoint ? timeSet : 0;
+          status = injection < setpoint ? "TRIP" : "NO TRIP";
+        } else {
+          // Over Voltage
+          tripTime = injection > setpoint ? timeSet : 0;
+          status = injection > setpoint ? "TRIP" : "NO TRIP";
+        }
+
+        // Update result display
+        document.getElementById("volt-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("volt-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("volt-proof-steps");
+        const protectionType = type === "27" ? "Under Voltage" : "Over Voltage";
+        const condition = type === "27" ? "<" : ">";
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: Tipe = ${protectionType} (${type}), V_setpoint = ${setpoint} V, V_injection = ${injection} V</div>
+                <div class="calculation-step">Kondisi operasi ${protectionType}: V_injection ${condition} V_setpoint</div>
+                <div class="calculation-step">Karena V_injection (${injection} V) ${condition} V_setpoint (${setpoint} V) = ${injection < setpoint ? "True" : "False"}, maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk kurva DT = Tset = ${timeSet} detik</div>
+            `;
+        document.getElementById("volt-proof").style.display = "block";
+
+        // Update chart
+        if (voltChart) {
+          const labels = [60, 70, 75, 80, 85, 90, 100, 110];
+          const underVoltData = labels.map((v) => (v < setpoint ? timeSet : 0));
+          const overVoltData = labels.map((v) => (v > setpoint ? timeSet : 0));
+
+          voltChart.data.datasets[0].data = underVoltData;
+          voltChart.data.datasets[1].data = overVoltData;
+          voltChart.update();
+        }
+      }
+
+      function calculateFrequency() {
+        const type = document.getElementById("freq-type").value;
+        const setpoint = parseFloat(
+          document.getElementById("freq-setpoint").value,
+        );
+        const timeSet = parseFloat(document.getElementById("freq-time").value);
+        const injection = parseFloat(
+          document.getElementById("freq-injection").value,
+        );
+
+        let tripTime, status;
+        if (type === "81U") {
+          // Under Frequency
+          tripTime = injection < setpoint ? timeSet : 0;
+          status = injection < setpoint ? "TRIP" : "NO TRIP";
+        } else {
+          // Over Frequency
+          tripTime = injection > setpoint ? timeSet : 0;
+          status = injection > setpoint ? "TRIP" : "NO TRIP";
+        }
+
+        // Update result display
+        document.getElementById("freq-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("freq-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("freq-proof-steps");
+        const protectionType =
+          type === "81U" ? "Under Frequency" : "Over Frequency";
+        const condition = type === "81U" ? "<" : ">";
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: Tipe = ${protectionType} (${type}), f_setpoint = ${setpoint} Hz, f_injection = ${injection} Hz</div>
+                <div class="calculation-step">Kondisi operasi ${protectionType}: f_injection ${condition} f_setpoint</div>
+                <div class="calculation-step">Karena f_injection (${injection} Hz) ${condition} f_setpoint (${setpoint} Hz) = ${injection < setpoint ? "True" : "False"}, maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk kurva DT = Tset = ${timeSet} detik</div>
+            `;
+        document.getElementById("freq-proof").style.display = "block";
+
+        // Update chart
+        if (freqChart) {
+          const labels = [45, 47, 48, 49, 50, 51, 52, 53, 55];
+          const underFreqData = labels.map((f) => (f < setpoint ? timeSet : 0));
+          const overFreqData = labels.map((f) => (f > setpoint ? timeSet : 0));
+
+          freqChart.data.datasets[0].data = underFreqData;
+          freqChart.data.datasets[1].data = overFreqData;
+          freqChart.update();
+        }
+      }
+
+      function calculateDifferential() {
+        const slope =
+          parseFloat(document.getElementById("diff-slope").value) / 100;
+        const bias = parseFloat(document.getElementById("diff-bias").value);
+        const iTerm = parseFloat(
+          document.getElementById("diff-i-terminal").value,
+        );
+        const iNeut = parseFloat(
+          document.getElementById("diff-i-neutral").value,
+        );
+
+        const iOp = Math.abs(iTerm - iNeut);
+        const iRes = (Math.abs(iTerm) + Math.abs(iNeut)) / 2;
+        const threshold = slope * iRes + bias;
+        const status = iOp > threshold ? "TRIP" : "NO TRIP";
+        const tripTime = 0.025; // Instantaneous
+
+        // Update result display
+        document.getElementById("diff-i-op").textContent = iOp.toFixed(3);
+        document.getElementById("diff-i-res").textContent = iRes.toFixed(3);
+        document.getElementById("diff-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("diff-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("diff-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: Slope = ${slope * 100}%, I_bias = ${bias} A, I_terminal = ${iTerm} A, I_neutral = ${iNeut} A</div>
+                <div class="calculation-step">Arus operasi (I_op) = |I_terminal - I_neutral| = |${iTerm} - ${iNeut}| = ${iOp.toFixed(3)} A</div>
+                <div class="calculation-step">Arus restrain (I_res) = (|I_terminal| + |I_neutral|) / 2 = (${Math.abs(iTerm)} + ${Math.abs(iNeut)}) / 2 = ${iRes.toFixed(3)} A</div>
+                <div class="calculation-step">Threshold operasi = (Slope × I_res) + I_bias = (${slope} × ${iRes.toFixed(3)}) + ${bias} = ${threshold.toFixed(3)} A</div>
+                <div class="calculation-step">Karena I_op (${iOp.toFixed(3)} A) ${iOp > threshold ? ">" : "≤"} threshold (${threshold.toFixed(3)} A), maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk proteksi differential = 0.025 detik (instantaneous)</div>
+            `;
+        document.getElementById("diff-proof").style.display = "block";
+
+        // Update chart
+        if (diffChart) {
+          const labels = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+          const data = labels.map((iRes) => slope * iRes + bias);
+          diffChart.data.datasets[0].data = data;
+          diffChart.update();
+        }
+      }
+
+      function calculateLossOfField() {
+        const z1 = parseFloat(document.getElementById("lof-z1").value);
+        const z2 = parseFloat(document.getElementById("lof-z2").value);
+        const voltage = parseFloat(
+          document.getElementById("lof-voltage").value,
+        );
+        const current = parseFloat(
+          document.getElementById("lof-current").value,
+        );
+
+        const measuredZ = voltage / current;
+        const status =
+          measuredZ <= z1 ? "TRIP Z1" : measuredZ <= z2 ? "TRIP Z2" : "NO TRIP";
+        const tripTime = measuredZ <= z1 ? 0.1 : measuredZ <= z2 ? 0.4 : 0;
+
+        // Update result display
+        document.getElementById("lof-measured-z").textContent =
+          measuredZ.toFixed(2);
+        document.getElementById("lof-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("lof-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("lof-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: Z1 = ${z1} Ω, Z2 = ${z2} Ω, V_injection = ${voltage} V, I_injection = ${current} A</div>
+                <div class="calculation-step">Impedansi terukur = V_injection / I_injection = ${voltage} / ${current} = ${measuredZ.toFixed(2)} Ω</div>
+                <div class="calculation-step">Karena Z_terukur (${measuredZ.toFixed(2)} Ω) ${measuredZ <= z1 ? "≤" : ">"} Z1 (${z1} Ω), maka relay akan ${status.includes("Z1") ? "TRIP pada Zona 1" : "TIDAK TRIP pada Zona 1"}</div>
+                <div class="calculation-step">Karena Z_terukur (${measuredZ.toFixed(2)} Ω) ${measuredZ <= z2 ? "≤" : ">"} Z2 (${z2} Ω), maka relay akan ${status.includes("Z2") ? "TRIP pada Zona 2" : "TIDAK TRIP pada Zona 2"}</div>
+                <div class="calculation-step">Status akhir: ${status}</div>
+                <div class="calculation-step">Waktu trip = ${tripTime} detik</div>
+            `;
+        document.getElementById("lof-proof").style.display = "block";
+
+        // Update chart
+        if (lofChart) {
+          // Add measurement point
+          const measurementPoint = {
+            x: measuredZ * 0.7,
+            y: measuredZ * 0.7,
+          };
+
+          // Add measurement point if not already exists
+          if (lofChart.data.datasets.length < 3) {
+            lofChart.data.datasets.push({
+              label: "Pengukuran",
+              data: [measurementPoint],
+              backgroundColor: "rgba(255, 152, 0, 0.8)",
+              pointRadius: 8,
+            });
+          } else {
+            lofChart.data.datasets[2].data = [measurementPoint];
+          }
+
+          lofChart.update();
+        }
+      }
+
+      function calculateReversePower() {
+        const setpoint = parseFloat(
+          document.getElementById("rpow-setpoint").value,
+        );
+        const timeSet = parseFloat(document.getElementById("rpow-time").value);
+        const voltage = parseFloat(
+          document.getElementById("rpow-voltage").value,
+        );
+        const current = parseFloat(
+          document.getElementById("rpow-current").value,
+        );
+        const pf = parseFloat(document.getElementById("rpow-pf").value);
+
+        const power = (Math.sqrt(3) * voltage * current * pf) / 1000; // in kW
+        const status = power < -setpoint ? "TRIP" : "NO TRIP";
+        const tripTime = power < -setpoint ? timeSet : 0;
+
+        // Update result display
+        document.getElementById("rpow-measured-p").textContent =
+          power.toFixed(2);
+        document.getElementById("rpow-theory-time").textContent =
+          tripTime.toFixed(3);
+        document.getElementById("rpow-result").style.display = "block";
+
+        // Generate proof of calculation
+        const proofSteps = document.getElementById("rpow-proof-steps");
+        proofSteps.innerHTML = `
+                <div class="calculation-step">Parameter input: P_setpoint = ${setpoint} kW, V_injection = ${voltage} V, I_injection = ${current} A, cos φ = ${pf}</div>
+                <div class="calculation-step">Daya terukur = √3 × V × I × cos φ = √3 × ${voltage} × ${current} × ${pf} = ${power.toFixed(2)} kW</div>
+                <div class="calculation-step">Karena P_terukur (${power.toFixed(2)} kW) ${power < -setpoint ? "<" : "≥"} -P_setpoint (${-setpoint} kW), maka relay akan ${status.toLowerCase()}</div>
+                <div class="calculation-step">Waktu trip untuk kurva DT = Tset = ${timeSet} detik</div>
+            `;
+        document.getElementById("rpow-proof").style.display = "block";
+
+        // Update chart
+        if (rpowChart) {
+          const labels = [-200, -100, -50, 0, 50, 100, 200];
+          const data = labels.map((p) => (p < -setpoint ? timeSet : 0));
+          rpowChart.data.datasets[0].data = data;
+          rpowChart.update();
+        }
+      }
+
+      function calculateDeviation(type) {
+        const actualTimeElement = document.getElementById(
+          `${type}-actual-time`,
+        );
+        const theoryTimeElement = document.getElementById(
+          `${type}-theory-time`,
+        );
+        const deviationElement = document.getElementById(`${type}-deviation`);
+        const statusElement = document.getElementById(`${type}-status`);
+
+        if (
+          !actualTimeElement ||
+          !theoryTimeElement ||
+          !deviationElement ||
+          !statusElement
+        )
+          return;
+
+        const actualTime = parseFloat(actualTimeElement.value) || 0;
+        const theoryTime = parseFloat(theoryTimeElement.textContent) || 0;
+
+        if (theoryTime === 0) {
+          deviationElement.textContent = "-";
+          statusElement.textContent = "NO TRIP";
+          statusElement.className = "status-fail";
+          return;
+        }
+
+        const deviation = Math.abs(
+          ((actualTime - theoryTime) / theoryTime) * 100,
+        );
+        deviationElement.textContent = deviation.toFixed(2) + "%";
+
+        if (deviation <= 5) {
+          statusElement.textContent = "PASS";
+          statusElement.className = "status-pass";
+        } else {
+          statusElement.textContent = "FAIL";
+          statusElement.className = "status-fail";
+        }
+      }
+
+      // Save and utility functions
+      function saveTestResult(type) {
+        let newRecord = { id: testRecords.length + 1 };
+        let actualTime, theoryTime, deviation, status;
+
+        switch (type) {
+          case "ns":
+            actualTime =
+              parseFloat(document.getElementById("ns-actual-time").value) || 0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("ns-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "Negative Sequence / NPS Current",
+              ansi: "46.1",
+              curve: "DT",
+              setting: document.getElementById("ns-pickup").value,
+              time: document.getElementById("ns-time").value,
+              injectionL1: document.getElementById("ns-l1-value").value + "A",
+              injectionL2: document.getElementById("ns-l2-value").value + "A",
+              injectionL3: document.getElementById("ns-l3-value").value + "A",
+              voltage: "-",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "se":
+            actualTime =
+              parseFloat(document.getElementById("se-actual-time").value) || 0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("se-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "95% stator earth fault",
+              ansi: "64G",
+              curve: "DT",
+              setting: document.getElementById("se-voltage").value + "V",
+              time: document.getElementById("se-time").value,
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: document.getElementById("se-injection").value + "V",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "oc":
+            actualTime =
+              parseFloat(document.getElementById("oc-actual-time").value) || 0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("oc-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "Over Current Phase",
+              ansi: "51",
+              curve: "SI",
+              setting: document.getElementById("oc-pickup").value + "A",
+              time: document.getElementById("oc-tms").value,
+              injectionL1: document.getElementById("oc-l1-value").value + "A",
+              injectionL2: document.getElementById("oc-l2-value").value + "A",
+              injectionL3: document.getElementById("oc-l3-value").value + "A",
+              voltage: "-",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "dp":
+            actualTime =
+              parseFloat(document.getElementById("dp-actual-time").value) || 0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("dp-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "Distance Protection Z1",
+              ansi: "21",
+              curve: "Quad",
+              setting: document.getElementById("dp-impedance").value + "Ω",
+              time: "0.025",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage:
+                "V:" +
+                document.getElementById("dp-voltage").value +
+                "V, I:" +
+                document.getElementById("dp-current").value +
+                "A",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "volt":
+            actualTime =
+              parseFloat(document.getElementById("volt-actual-time").value) ||
+              0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("volt-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: `${document.getElementById("volt-type").value === "27" ? "Under" : "Over"} Voltage`,
+              ansi: document.getElementById("volt-type").value,
+              curve: "DT",
+              setting: document.getElementById("volt-setpoint").value + "V",
+              time: document.getElementById("volt-time").value,
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: document.getElementById("volt-injection").value + "V",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "freq":
+            actualTime =
+              parseFloat(document.getElementById("freq-actual-time").value) ||
+              0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("freq-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: `${document.getElementById("freq-type").value === "81U" ? "Under" : "Over"} Frequency`,
+              ansi: document.getElementById("freq-type").value,
+              curve: "DT",
+              setting: document.getElementById("freq-setpoint").value + "Hz",
+              time: document.getElementById("freq-time").value,
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage: document.getElementById("freq-injection").value + "Hz",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "diff":
+            actualTime =
+              parseFloat(document.getElementById("diff-actual-time").value) ||
+              0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("diff-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "Generator Differential",
+              ansi: "87G",
+              curve: "Dual Slope",
+              setting: document.getElementById("diff-slope").value + "%",
+              time: "Inst",
+              injectionL1:
+                "I_term:" +
+                document.getElementById("diff-i-terminal").value +
+                "A",
+              injectionL2:
+                "I_neut:" +
+                document.getElementById("diff-i-neutral").value +
+                "A",
+              injectionL3: "-",
+              voltage: "-",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "lof":
+            actualTime =
+              parseFloat(document.getElementById("lof-actual-time").value) || 0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("lof-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "Loss of Field",
+              ansi: "40",
+              curve: "Mho",
+              setting: "Z1:" + document.getElementById("lof-z1").value + "Ω",
+              time: "T1:0.1s",
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage:
+                "V:" +
+                document.getElementById("lof-voltage").value +
+                "V, I:" +
+                document.getElementById("lof-current").value +
+                "A",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+
+          case "rpow":
+            actualTime =
+              parseFloat(document.getElementById("rpow-actual-time").value) ||
+              0;
+            theoryTime =
+              parseFloat(
+                document.getElementById("rpow-theory-time").textContent,
+              ) || 0;
+            deviation = actualTime
+              ? Math.abs(((actualTime - theoryTime) / theoryTime) * 100)
+              : 0;
+            status = deviation <= 5 ? "PASS" : "FAIL";
+
+            newRecord = {
+              id: testRecords.length + 1,
+              protection: "Reverse Power",
+              ansi: "32",
+              curve: "DT",
+              setting: document.getElementById("rpow-setpoint").value + "kW",
+              time: document.getElementById("rpow-time").value,
+              injectionL1: "-",
+              injectionL2: "-",
+              injectionL3: "-",
+              voltage:
+                "V:" +
+                document.getElementById("rpow-voltage").value +
+                "V, I:" +
+                document.getElementById("rpow-current").value +
+                "A",
+              tripRecord: actualTime > 0 ? "Yes" : "No",
+              timeRecord: actualTime.toFixed(3),
+              theory: theoryTime.toFixed(3),
+              tolerance: deviation.toFixed(2) + "%",
+              status: status,
+            };
+            break;
+        }
+
+        testRecords.push(newRecord);
+        saveTestRecords();
+        updateDashboardTable();
+        updateTestRecordsTable();
+
+        // Show success message
+        alert("Data tes berhasil disimpan!");
+      }
+
+      function updateDashboardTable() {
+        const tbody = document.getElementById("dashboard-table-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        testRecords.slice(0, 4).forEach((record, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${index + 1}</td><td>${record.protection}</td><td>${record.ansi}</td><td>${record.curve}: ${record.setting}, T: ${record.time}s</td><td>${record.injectionL1 !== "-" ? record.injectionL1 : record.voltage !== "-" ? record.voltage : "-"}</td><td>${record.theory}s</td><td>${record.timeRecord}s</td><td><span class="tolerance-indicator ${getToleranceClass(record.tolerance)}"></span>${record.tolerance}</td><td><span class="${record.status === "PASS" ? "status-pass" : "status-fail"}">${record.status}</span></td><td class="no-print"><button class="btn btn-sm btn-outline-primary" onclick="viewDetail(${record.id})">Detail</button></td>`;
+          tbody.appendChild(row);
+        });
+      }
+
+      function updateTestRecordsTable() {
+        const tbody = document.getElementById("test-records-body");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        testRecords.forEach((record) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${record.id}</td><td>${record.protection}</td><td>${record.ansi}</td><td>${record.curve}</td><td>${record.setting}</td><td>${record.time}</td><td>${record.injectionL1 || "-"}</td><td>${record.injectionL2 || "-"}</td><td>${record.injectionL3 || "-"}</td><td>${record.voltage || "-"}</td><td>${record.tripRecord}</td><td>${record.timeRecord}</td><td>${record.theory}</td><td><span class="tolerance-indicator ${getToleranceClass(record.tolerance)}"></span>${record.tolerance}</td><td><span class="${record.status === "PASS" ? "status-pass" : "status-fail"}">${record.status}</span></td><td class="no-print"><button class="btn btn-sm btn-primary" onclick="editTest(${record.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="deleteTest(${record.id})"><i class="fas fa-trash"></i></button></td>`;
+          tbody.appendChild(row);
+        });
+      }
+
+      function getToleranceClass(tolerance) {
+        const value = parseFloat(tolerance);
+        if (isNaN(value)) return "tolerance-bad";
+        if (value <= 5) return "tolerance-good";
+        if (value <= 10) return "tolerance-warning";
+        return "tolerance-bad";
+      }
+
+      function viewDetail(id) {
+        const record = testRecords.find((r) => r.id === id);
+        if (record)
+          alert(
+            `Detail Test ID ${id}:\n\nProteksi: ${record.protection}\nANSI: ${record.ansi}\nStatus: ${record.status}\nWaktu Trip: ${record.timeRecord}s (Teori: ${record.theory}s)\nToleransi: ${record.tolerance}`,
+          );
+      }
+      function editTest(id) {
+        const record = testRecords.find((r) => r.id === id);
+        if (record) {
+          const newTimeRecord = prompt(
+            "Edit waktu trip aktual (s):",
+            record.timeRecord,
+          );
+          if (newTimeRecord !== null) {
+            record.timeRecord = parseFloat(newTimeRecord).toFixed(3);
+            const theoryTime = parseFloat(record.theory);
+            const deviation = Math.abs(
+              ((parseFloat(newTimeRecord) - theoryTime) / theoryTime) * 100,
+            );
+            record.tolerance = deviation.toFixed(2) + "%";
+            record.status = deviation <= 5 ? "PASS" : "FAIL";
+            saveTestRecords();
+            updateDashboardTable();
+            updateTestRecordsTable();
+          }
+        }
+      }
+      function deleteTest(id) {
+        if (confirm("Apakah Anda yakin ingin menghapus data tes ini?")) {
+          testRecords = testRecords.filter((r) => r.id !== id);
+          saveTestRecords();
+          updateDashboardTable();
+          updateTestRecordsTable();
+        }
+      }
+      function addNewTest() {
+        alert(
+          'Silakan pilih tab proteksi yang ingin diuji dan klik tombol "Simpan Hasil" setelah melakukan perhitungan.',
+        );
+      }
+      function exportReport() {
+        alert(
+          "Fitur export ke Excel akan segera tersedia. Data telah disimpan di browser lokal Anda.",
+        );
+      }
+    </script>
+  </body>
+</html>
